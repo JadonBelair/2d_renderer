@@ -1,13 +1,13 @@
-all: main.o texture.o renderer.o
+all: build/main.o build/texture.o build/renderer.o
 	gcc -o ./build/main ./build/*.o -lX11 -lXcursor -lXi -lGL -lm
 
-main.o: ./src/main.c
+build/main.o: src/main.c
 	gcc -c src/main.c -o ./build/main.o
 
-texture.o: ./src/texture.c
+build/texture.o: src/texture.c
 	gcc -c src/texture.c -o ./build/texture.o
 
-renderer.o: ./src/renderer.c
+build/renderer.o: src/renderer.c
 	gcc -c src/renderer.c -o ./build/renderer.o
 
 clean:
