@@ -1,5 +1,16 @@
-#define SOKOL_IMPL
+#ifdef __linux__
+#define SOKOL_GLCORE
+#endif
+
+#ifdef _WIN32
 #define SOKOL_D3D11
+#endif
+
+#ifdef __APPLE__
+#define SOKOL_METAL
+#endif
+
+#define SOKOL_IMPL
 #include "renderer.h"
 
 // define these in your application
