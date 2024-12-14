@@ -20,6 +20,8 @@ bool is_key_just_released(sapp_keycode);
 float get_width();
 float get_height();
 
+float delta_time();
+
 void update_proj();
 void mat_to_1d(mat4, float[16]);
 void draw_texture(Texture2D, vec2, vec2, float);

@@ -21,6 +21,8 @@ void update() {
 		sapp_request_quit();
 	}
 
+	float speed = 300.0f * delta_time();
+
 	vec2 dir = {0.0f, 0.0f};
 	if (is_key_down(SAPP_KEYCODE_A) || is_key_down(SAPP_KEYCODE_LEFT)) {
 		dir[0] -= 1.0f;
@@ -34,7 +36,8 @@ void update() {
 	if (is_key_down(SAPP_KEYCODE_S) || is_key_down(SAPP_KEYCODE_DOWN)) {
 		dir[1] += 1.0f;
 	}
-	glm_vec2_normalize(dir);
+	glm_vec2_scale_as(dir, speed, dir);
+
 	pos[0] += dir[0];
 	pos[1] += dir[1];
 

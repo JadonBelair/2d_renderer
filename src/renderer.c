@@ -13,6 +13,7 @@
 #define SOKOL_IMPL
 #include "renderer.h"
 
+// target size for viewport,
 // define these in your application
 extern int target_width, target_height;
 
@@ -161,7 +162,13 @@ void draw_texture(Texture2D tex, vec2 pos, vec2 size, float angle) {
 	sg_draw(0, 6, 1);
 }
 
+uint64_t prev;
+uint64_t current;
+
 void start_frame() {
+	prev = current;
+	current = stm_now();
+
 	update_proj();
 	sg_begin_pass(&(sg_pass) { .action=state.pass_action, .swapchain=sglue_swapchain() });
 	sg_apply_pipeline(state.pip);
@@ -193,4 +200,8 @@ float get_width() {
 
 float get_height() {
 	return height;
+}
+
+float delta_time() {
+	return stm_sec(stm_diff(current, prev));
 }
