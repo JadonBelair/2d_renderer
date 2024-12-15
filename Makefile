@@ -15,3 +15,4 @@ shaders/texture-sapp.h: shaders/texture-sapp.glsl
 
 clean:
 	rm -f ./build/*
+	rm ./shaders/texture-sapp.h
