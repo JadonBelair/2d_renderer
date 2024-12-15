@@ -4,8 +4,17 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "includes.h"
 #include "texture.h"
+
+#include "../libs/sokol/sokol_app.h"
+#include "../libs/sokol/sokol_log.h"
+#include "../libs/sokol/sokol_glue.h"
+#include "../libs/sokol/sokol_time.h"
+
+#include "../shaders/texture-sapp.glsl.c"
+
+#include "../libs/cglm/cglm.h"
+
 
 // runs once at the start of the application
 void setup();

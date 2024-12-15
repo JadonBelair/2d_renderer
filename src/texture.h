@@ -1,6 +1,6 @@
 #pragma once
 
-#include "includes.h"
+#include "../libs/sokol/sokol_gfx.h"
 
 typedef struct {
 	sg_image id;

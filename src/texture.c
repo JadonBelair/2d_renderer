@@ -1,4 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
+#include "../libs/stb_image.h"
+
 #include "texture.h"
 
 Texture2D make_texture(const char* file_path) {
