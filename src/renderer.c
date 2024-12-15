@@ -126,12 +126,17 @@ void mat_to_1d(mat4 mat, float arr[16]) {
 }
 
 void update_proj() {
-	if (sapp_width() > sapp_height()) {
+	float current_width = sapp_widthf();
+	float current_height = sapp_heightf();
+	float current_ratio = current_width / current_height;
+
+	float target_ratio = (float)target_width / (float)target_height;
+	if (target_width * current_ratio > target_width * target_ratio) {
 		height = (float)target_height;
-		width = (sapp_widthf() / sapp_heightf()) * height;
+		width = current_ratio * height;
 	} else {
 		width = (float)target_width;
-		height = (sapp_heightf() / sapp_widthf()) * width;
+		height = width / current_ratio;
 	}
 
 	glm_ortho(0.0f, width, height, 0.0f, -1.0f, 1.0f, state.proj);
@@ -194,11 +199,11 @@ bool is_key_just_released(sapp_keycode code) {
 	return just_released[code];
 }
 
-float get_width() {
+float get_view_width() {
 	return width;
 }
 
-float get_height() {
+float get_view_height() {
 	return height;
 }
 

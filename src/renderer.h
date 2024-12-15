@@ -26,8 +26,8 @@ bool is_key_down(sapp_keycode);
 bool is_key_just_pressed(sapp_keycode);
 bool is_key_just_released(sapp_keycode);
 
-float get_width();
-float get_height();
+float get_view_width();
+float get_view_height();
 
 float delta_time();
 

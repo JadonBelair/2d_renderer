@@ -41,8 +41,8 @@ void update() {
 	pos[0] += dir[0];
 	pos[1] += dir[1];
 
-	pos[0] = glm_clamp(pos[0], 0.0f, get_width()-crate.width);
-	pos[1] = glm_clamp(pos[1], 0.0f, get_height()-crate.height);
+	pos[0] = glm_clamp(pos[0], 0.0f, get_view_width()-crate.width);
+	pos[1] = glm_clamp(pos[1], 0.0f, get_view_height()-crate.height);
 
 	vec2 size = {crate.width, crate.height};
 	draw_texture(crate, pos, size, 0.0f);
