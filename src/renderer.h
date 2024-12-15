@@ -11,7 +11,7 @@
 #include "../libs/sokol/sokol_glue.h"
 #include "../libs/sokol/sokol_time.h"
 
-#include "../shaders/texture-sapp.glsl.c"
+#include "../shaders/texture-sapp.h"
 
 #include "../libs/cglm/cglm.h"
 
