@@ -1,10 +1,15 @@
 #include "renderer.h"
 
-int target_width = 600;
-int target_height = 400;
-
 vec2 pos;
 Texture2D crate;
+
+window_conf window_config() {
+	return (window_conf) {
+		.title = "Test 2D Renderer",
+		.target_width = 600,
+		.target_height = 400,
+	};
+}
 
 void setup() {
 	pos[0] = 300.0f;

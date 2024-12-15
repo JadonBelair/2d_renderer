@@ -15,6 +15,18 @@
 
 #include "../libs/cglm/cglm.h"
 
+// holds window config information.
+// title: window title.
+// target_width: the target width for the viewport.
+// target_height: the target height for the viewport.
+typedef struct {
+	char* title;
+	int target_width;
+	int target_height;
+} window_conf;
+
+// define in your program to set basic window and application information
+window_conf window_config();
 
 // runs once at the start of the application
 void setup();

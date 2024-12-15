@@ -13,16 +13,13 @@
 #define SOKOL_IMPL
 #include "renderer.h"
 
-// target size for viewport,
-// define these in your application
-extern int target_width, target_height;
-
 #define NUM_KEYS 348
 bool is_down[NUM_KEYS] = {false};
 bool just_pressed[NUM_KEYS] = {false};
 bool just_released[NUM_KEYS] = {false};
 
 float width, height;
+window_conf conf;
 
 static struct {
 	sg_pipeline pip;
@@ -116,14 +113,15 @@ void event(const sapp_event* event) {
 }
 
 sapp_desc sokol_main(int argc, char **argv) {
+	conf = window_config();
 	return (sapp_desc) {
 		.init_cb = init,
 		.frame_cb = frame,
 		.cleanup_cb = cleanup,
 		.event_cb = event,
-		.width = target_width,
-		.height = target_height,
-		.window_title = "Sokol Test App",
+		.width = conf.target_width,
+		.height = conf.target_height,
+		.window_title = conf.title,
 		.icon.sokol_default = true,
 		.logger.func = slog_func,
 	};
@@ -141,12 +139,12 @@ void update_proj() {
 	float current_height = sapp_heightf();
 	float current_ratio = current_width / current_height;
 
-	float target_ratio = (float)target_width / (float)target_height;
-	if (target_width * current_ratio > target_width * target_ratio) {
-		height = (float)target_height;
+	float target_ratio = (float)conf.target_width / (float)conf.target_height;
+	if (conf.target_width * current_ratio > conf.target_width * target_ratio) {
+		height = (float)conf.target_height;
 		width = current_ratio * height;
 	} else {
-		width = (float)target_width;
+		width = (float)conf.target_width;
 		height = width / current_ratio;
 	}
 
