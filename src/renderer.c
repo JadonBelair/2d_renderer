@@ -73,10 +73,6 @@ static void init(void) {
 				[ATTR_texture_position].format = SG_VERTEXFORMAT_FLOAT2,
 			}
 		},
-		.depth = {
-			.compare = SG_COMPAREFUNC_LESS_EQUAL,
-			.write_enabled = true,
-		},
 		.colors[0] = {
 			.blend = {
 				.enabled = true,
