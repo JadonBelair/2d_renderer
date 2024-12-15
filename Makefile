@@ -1,4 +1,5 @@
-all: shaders/texture-sapp.h build/main.o build/texture.o build/renderer.o
+all: build/main
+build/main: shaders/texture-sapp.h build/main.o build/texture.o build/renderer.o
 	gcc -o ./build/main ./build/*.o -lX11 -lXcursor -lXi -lGL -lm
 
 build/main.o: src/main.c
