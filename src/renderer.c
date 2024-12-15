@@ -73,6 +73,21 @@ static void init(void) {
 				[ATTR_texture_position].format = SG_VERTEXFORMAT_FLOAT2,
 			}
 		},
+		.depth = {
+			.compare = SG_COMPAREFUNC_LESS_EQUAL,
+			.write_enabled = true,
+		},
+		.colors[0] = {
+			.blend = {
+				.enabled = true,
+				.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+				.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+				.op_rgb = SG_BLENDOP_ADD,
+				.src_factor_alpha = SG_BLENDFACTOR_SRC_ALPHA,
+				.dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+				.op_alpha = SG_BLENDOP_ADD,
+			},
+		},
 	});
 
 	state.pass_action = (sg_pass_action) {
