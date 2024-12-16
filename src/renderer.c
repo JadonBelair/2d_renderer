@@ -114,13 +114,15 @@ void event(const sapp_event* event) {
 
 sapp_desc sokol_main(int argc, char **argv) {
 	conf = window_config();
+	int window_width = conf.window_width != 0 ? conf.window_width : conf.viewport_width;
+	int window_height = conf.window_height != 0 ? conf.window_height : conf.viewport_height;
 	return (sapp_desc) {
 		.init_cb = init,
 		.frame_cb = frame,
 		.cleanup_cb = cleanup,
 		.event_cb = event,
-		.width = conf.target_width,
-		.height = conf.target_height,
+		.width = window_width,
+		.height = window_height,
 		.window_title = conf.title,
 		.icon.sokol_default = true,
 		.logger.func = slog_func,
@@ -139,12 +141,12 @@ void update_proj() {
 	float current_height = sapp_heightf();
 	float current_ratio = current_width / current_height;
 
-	float target_ratio = (float)conf.target_width / (float)conf.target_height;
-	if (conf.target_width * current_ratio > conf.target_width * target_ratio) {
-		height = (float)conf.target_height;
+	float target_ratio = (float)conf.viewport_width / (float)conf.viewport_height;
+	if (conf.viewport_width * current_ratio > conf.viewport_width * target_ratio) {
+		height = (float)conf.viewport_height;
 		width = current_ratio * height;
 	} else {
-		width = (float)conf.target_width;
+		width = (float)conf.viewport_width;
 		height = width / current_ratio;
 	}
 

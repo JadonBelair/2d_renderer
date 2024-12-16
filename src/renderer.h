@@ -19,10 +19,14 @@
 // title: window title.
 // target_width: the target width for the viewport.
 // target_height: the target height for the viewport.
+// window_width: initial width of the window.
+// window_height: initial height of the window.
 typedef struct {
 	char* title;
-	int target_width;
-	int target_height;
+	int viewport_width;
+	int viewport_height;
+	int window_width;
+	int window_height;
 } window_conf;
 
 // define in your program to set basic window and application information

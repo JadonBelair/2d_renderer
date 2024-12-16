@@ -6,8 +6,10 @@ Texture2D crate;
 window_conf window_config() {
 	return (window_conf) {
 		.title = "Test 2D Renderer",
-		.target_width = 600,
-		.target_height = 400,
+		.viewport_width = 600,
+		.viewport_height = 400,
+		.window_width = 1200,
+		.window_height = 800,
 	};
 }
 
