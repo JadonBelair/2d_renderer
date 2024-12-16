@@ -11,6 +11,7 @@ build/texture.o: src/texture.c
 build/renderer.o: src/renderer.c
 	gcc -c src/renderer.c -o ./build/renderer.o
 
+shader: shaders/texture-sapp.h
 shaders/texture-sapp.h: shaders/texture-sapp.glsl
 	./shaders/sokol-shdc --input ./shaders/texture-sapp.glsl --output ./shaders/texture-sapp.h --slang glsl430:hlsl5:metal_macos:wgsl
 

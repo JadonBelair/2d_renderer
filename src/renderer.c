@@ -13,6 +13,16 @@
 #define SOKOL_IMPL
 #include "renderer.h"
 
+#define NUM_QUADS 1000
+#define NUM_VERTS (NUM_QUADS * 4)
+
+#define NUM_POSITIONS (NUM_QUADS * 16)
+#define NUM_POSITIONS_BYTES (NUM_QUADS * (sizeof(float)*16))
+float positions[NUM_POSITIONS];
+int instances = 0;
+
+#define pos_offset(i) (i*16)
+
 #define NUM_KEYS 348
 bool is_down[NUM_KEYS] = {false};
 bool just_pressed[NUM_KEYS] = {false};
@@ -52,6 +62,11 @@ static void init(void) {
 		.data = SG_RANGE(vertices),
 	});
 
+	state.bind.vertex_buffers[1] = sg_make_buffer(&(sg_buffer_desc) {
+		.usage = SG_USAGE_STREAM,
+		.size = NUM_POSITIONS_BYTES,
+	});
+
 	state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc) {
 		.type = SG_BUFFERTYPE_INDEXBUFFER,
 		.data = SG_RANGE(indicies),
@@ -68,7 +83,12 @@ static void init(void) {
 		.layout = {
 			.attrs = {
 				[ATTR_texture_position].format = SG_VERTEXFORMAT_FLOAT2,
-			}
+				[ATTR_texture_inst_mat0] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset =  0, .buffer_index = 1}, 
+				[ATTR_texture_inst_mat1] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = 16, .buffer_index = 1},
+				[ATTR_texture_inst_mat3] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = 48, .buffer_index = 1},
+			},
+			.buffers[0] = {.step_func = SG_VERTEXSTEP_PER_VERTEX},
+			.buffers[1] = {.step_func = SG_VERTEXSTEP_PER_INSTANCE, .stride = 64},
 		},
 		.colors[0] = {
 			.blend = {
@@ -153,7 +173,35 @@ void update_proj() {
 	glm_ortho(0.0f, width, height, 0.0f, -1.0f, 1.0f, state.proj);
 }
 
+void draw_instances() {
+	if (instances == 0) return;
+
+	sg_update_buffer(state.bind.vertex_buffers[1], &SG_RANGE(positions));
+	sg_apply_bindings(&state.bind);
+
+	vs_params_t vs_params;
+	mat_to_1d(state.proj, vs_params.p);
+	sg_apply_uniforms(UB_vs_params, &SG_RANGE(vs_params));
+
+	sg_draw(0, 6, instances);
+
+	instances = 0;
+	memset(positions, 0, sizeof(positions));
+
+	// TODO: try and find a better way of clearing the 
+	// buffer besides deleting and making a new one
+	sg_destroy_buffer(state.bind.vertex_buffers[1]);
+	state.bind.vertex_buffers[1] = sg_make_buffer(&(sg_buffer_desc) {
+		.usage = SG_USAGE_STREAM,
+		.size = NUM_POSITIONS_BYTES,
+	});
+}
+
 void draw_texture(Texture2D tex, vec2 pos, vec2 size, float angle) {
+	if (instances == 1000) {
+		draw_instances();
+	}
+
 	bind_texture(&state.bind.images[IMG_tex], tex);
 
 	mat4 model;
@@ -169,13 +217,8 @@ void draw_texture(Texture2D tex, vec2 pos, vec2 size, float angle) {
 	vec3 size_3d = {size[0], size[1], 1.0f};
 	glm_scale(model, size_3d);
 
-	vs_params_t vs_params;
-	mat_to_1d(model, vs_params.m);
-	mat_to_1d(state.proj, vs_params.p);
-
-	sg_apply_bindings(&state.bind);
-	sg_apply_uniforms(UB_vs_params, &SG_RANGE(vs_params));
-	sg_draw(0, 6, 1);
+	mat_to_1d(model, &positions[pos_offset(instances)]);
+	instances++;
 }
 
 uint64_t prev;
@@ -191,6 +234,8 @@ void start_frame() {
 }
 
 void end_frame() {
+	draw_instances();
+
 	sg_end_pass();
 	sg_commit();
 

@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include <stdlib.h>
 
 vec2 pos;
 Texture2D crate;
@@ -21,6 +22,7 @@ void setup() {
 }
 
 void update() {
+	srand(0);
 	if (is_key_just_pressed(SAPP_KEYCODE_F)) {
 		sapp_toggle_fullscreen();
 	}
@@ -51,7 +53,10 @@ void update() {
 	pos[0] = glm_clamp(pos[0], 0.0f, get_view_width()-crate.width);
 	pos[1] = glm_clamp(pos[1], 0.0f, get_view_height()-crate.height);
 
+
 	vec2 size = {crate.width, crate.height};
-	draw_texture(crate, (vec2){0.0f, 0.0f}, size, 0.0f);
-	draw_texture(crate, pos, size, 0.0f);
+	for (int i = 0; i < 15000; i++) {
+		vec2 pos = {rand()%(int)get_view_width(), rand()%(int)get_view_height()};
+		draw_texture(crate, pos, size, 0.0f);
+	}
 }
