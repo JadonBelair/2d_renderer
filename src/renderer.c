@@ -12,6 +12,7 @@
 
 #define SOKOL_IMPL
 #include "renderer.h"
+#include "../shaders/texture-sapp.h"
 
 #define NUM_QUADS 1000
 #define NUM_VERTS (NUM_QUADS * 4)
@@ -34,8 +35,6 @@ bool just_released[NUM_KEYS] = {false};
 
 float width, height;
 window_conf conf;
-
-extern ImageData rects[1000];
 
 static struct {
 	sg_pipeline pip;
