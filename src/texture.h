@@ -14,7 +14,7 @@ typedef struct {
 
 typedef struct {
 	stbi_uc* data;
-	stbrp_rect rect;
+	int width, height;
 } ImageData;
 
 Texture2D make_texture(const char*);

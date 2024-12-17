@@ -107,6 +107,10 @@ static void init(void) {
 			.buffers[0] = {.step_func = SG_VERTEXSTEP_PER_VERTEX},
 			.buffers[1] = {.step_func = SG_VERTEXSTEP_PER_INSTANCE, .stride = sizeof(float)*16},
 		},
+		.depth = {
+			.compare = SG_COMPAREFUNC_LESS_EQUAL,
+			.write_enabled = true,
+		},
 		.colors[0] = {
 			.blend = {
 				.enabled = true,
@@ -127,12 +131,12 @@ static void init(void) {
 	setup();
 	ImageData atlas = build_atlas();
 	state.bind.images[0] = sg_make_image(&(sg_image_desc) {
-		.width = atlas.rect.w,
-		.height = atlas.rect.h,
+		.width = atlas.width,
+		.height = atlas.height,
 		.pixel_format = SG_PIXELFORMAT_RGBA8,
 		.data.subimage[0][0] = {
 			.ptr = atlas.data,
-			.size = atlas.rect.w * atlas.rect.h * 4,
+			.size = atlas.width * atlas.height * 4,
 		},
 	});
 	stbi_image_free(atlas.data);
