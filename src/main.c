@@ -3,6 +3,9 @@
 
 vec2 pos;
 Texture2D crate;
+Texture2D button;
+Texture2D sword;
+float overall;
 
 window_conf window_config() {
 	return (window_conf) {
@@ -18,7 +21,13 @@ void setup() {
 	pos[0] = 300.0f;
 	pos[1] = 350.0f;
 
+	overall = 0.0f;
+
 	crate = make_texture("image.png");
+	button = make_texture("button.png");
+	sword = make_texture("sword.png");
+
+	// printf("%d %d\n", crate.id, button.id);
 }
 
 void update() {
@@ -57,6 +66,18 @@ void update() {
 	vec2 size = {crate.width, crate.height};
 	for (int i = 0; i < 15000; i++) {
 		vec2 pos = {rand()%(int)get_view_width(), rand()%(int)get_view_height()};
-		draw_texture(crate, pos, size, 0.0f);
+		Texture2D tex;
+		int idx = rand() % 3;
+		if (idx == 0) {
+			tex = crate;
+		} else if (idx == 1) {
+			tex = sword;
+		} else {
+			tex = button;
+		}
+		draw_texture(tex, pos, size, overall);
 	}
+	draw_texture(button, pos, size, overall);
+
+	overall += delta_time();
 }

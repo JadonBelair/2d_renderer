@@ -8,12 +8,20 @@ layout(binding=0) uniform vs_params {
     mat4 p;
 };
 
+struct uv_data {
+	vec2 pos;
+};
+
+layout(binding=0) readonly buffer uvs {
+	uv_data uv_arr[];
+};
+
 out vec2 uv;
 
 void main() {
 	mat4 m = mat4(inst_mat0, inst_mat1, vec4(0.0,0.0,1.0,1.0), inst_mat3);
     gl_Position = p * m * vec4(position, 0.0, 1.0);
-    uv = position;
+    uv = uv_arr[gl_VertexIndex + gl_InstanceIndex*4].pos;
 }
 @end
 

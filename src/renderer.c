@@ -18,10 +18,14 @@
 
 #define NUM_POSITIONS (NUM_QUADS * 16)
 #define NUM_POSITIONS_BYTES (NUM_QUADS * (sizeof(float)*16))
+#define NUM_UVS NUM_VERTS
+#define NUM_UVS_BYTES (NUM_UVS * sizeof(uv_data_t))
 float positions[NUM_POSITIONS];
+uv_data_t uvs[NUM_UVS];
 int instances = 0;
 
 #define pos_offset(i) (i*16)
+#define uv_offset(i) (i*4)
 
 #define NUM_KEYS 348
 bool is_down[NUM_KEYS] = {false};
@@ -30,6 +34,8 @@ bool just_released[NUM_KEYS] = {false};
 
 float width, height;
 window_conf conf;
+
+extern ImageData rects[1000];
 
 static struct {
 	sg_pipeline pip;
@@ -67,6 +73,17 @@ static void init(void) {
 		.size = NUM_POSITIONS_BYTES,
 	});
 
+	state.bind.vertex_buffers[2] = sg_make_buffer(&(sg_buffer_desc) {
+		.usage = SG_USAGE_STREAM,
+		.size = NUM_UVS_BYTES,
+	});
+
+	state.bind.storage_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
+		.type = SG_BUFFERTYPE_STORAGEBUFFER,
+		.usage = SG_USAGE_STREAM,
+		.size = NUM_UVS_BYTES,
+	});
+
 	state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc) {
 		.type = SG_BUFFERTYPE_INDEXBUFFER,
 		.data = SG_RANGE(indicies),
@@ -88,7 +105,7 @@ static void init(void) {
 				[ATTR_texture_inst_mat3] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = 48, .buffer_index = 1},
 			},
 			.buffers[0] = {.step_func = SG_VERTEXSTEP_PER_VERTEX},
-			.buffers[1] = {.step_func = SG_VERTEXSTEP_PER_INSTANCE, .stride = 64},
+			.buffers[1] = {.step_func = SG_VERTEXSTEP_PER_INSTANCE, .stride = sizeof(float)*16},
 		},
 		.colors[0] = {
 			.blend = {
@@ -108,6 +125,17 @@ static void init(void) {
 	};
 
 	setup();
+	ImageData atlas = build_atlas();
+	state.bind.images[0] = sg_make_image(&(sg_image_desc) {
+		.width = atlas.rect.w,
+		.height = atlas.rect.h,
+		.pixel_format = SG_PIXELFORMAT_RGBA8,
+		.data.subimage[0][0] = {
+			.ptr = atlas.data,
+			.size = atlas.rect.w * atlas.rect.h * 4,
+		},
+	});
+	stbi_image_free(atlas.data);
 }
 
 void frame(void) {
@@ -177,6 +205,7 @@ void draw_instances() {
 	if (instances == 0) return;
 
 	sg_update_buffer(state.bind.vertex_buffers[1], &SG_RANGE(positions));
+	sg_update_buffer(state.bind.storage_buffers[0], &SG_RANGE(uvs));
 	sg_apply_bindings(&state.bind);
 
 	vs_params_t vs_params;
@@ -187,6 +216,7 @@ void draw_instances() {
 
 	instances = 0;
 	memset(positions, 0, sizeof(positions));
+	memset(uvs, 0, sizeof(uvs));
 
 	// TODO: try and find a better way of clearing the 
 	// buffer besides deleting and making a new one
@@ -195,14 +225,43 @@ void draw_instances() {
 		.usage = SG_USAGE_STREAM,
 		.size = NUM_POSITIONS_BYTES,
 	});
+
+	sg_destroy_buffer(state.bind.storage_buffers[0]);
+	state.bind.storage_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
+		.type = SG_BUFFERTYPE_STORAGEBUFFER,
+		.usage = SG_USAGE_STREAM,
+		.size = NUM_UVS_BYTES,
+	});
 }
 
 void draw_texture(Texture2D tex, vec2 pos, vec2 size, float angle) {
-	if (instances == 1000) {
+	if (instances == NUM_QUADS) {
 		draw_instances();
 	}
 
-	bind_texture(&state.bind.images[IMG_tex], tex);
+	// quad vertex layout
+	// 0  1
+	// 3  2
+	//
+	// index order
+	// 0, 1, 3
+	// 1, 2, 3
+	
+
+	stbrp_rect texture_rect = get_texture_rect(tex.id);
+
+	int offset = uv_offset(instances);
+	uvs[offset+0].pos[0] = (float)texture_rect.x / (float)NUM_NODES;
+	uvs[offset+0].pos[1] = (float)texture_rect.y / (float)NUM_NODES;
+
+	uvs[offset+1].pos[0] = (float)(texture_rect.x + tex.width) / (float)NUM_NODES;
+	uvs[offset+1].pos[1] = (float)texture_rect.y / (float)NUM_NODES;
+
+	uvs[offset+2].pos[0] = (float)(texture_rect.x + tex.width) / (float)NUM_NODES;
+	uvs[offset+2].pos[1] = (float)(texture_rect.y + tex.height) / (float)NUM_NODES;
+
+	uvs[offset+3].pos[0] = (float)texture_rect.x / (float)NUM_NODES;
+	uvs[offset+3].pos[1] = (float)(texture_rect.y + tex.height) / (float)NUM_NODES;
 
 	mat4 model;
 	glm_mat4_identity(model);
