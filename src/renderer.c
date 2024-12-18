@@ -19,14 +19,12 @@
 
 #define NUM_POSITIONS (NUM_QUADS * 16)
 #define NUM_POSITIONS_BYTES (NUM_QUADS * (sizeof(float)*16))
-#define NUM_UVS NUM_VERTS
-#define NUM_UVS_BYTES (NUM_UVS * sizeof(uv_data_t))
+#define NUM_UVS NUM_QUADS
 float positions[NUM_POSITIONS];
-uv_data_t uvs[NUM_UVS];
+float uvs[NUM_UVS];
 int instances = 0;
 
 #define pos_offset(i) (i*16)
-#define uv_offset(i) (i*4)
 
 #define NUM_KEYS 348
 bool is_down[NUM_KEYS] = {false};
@@ -80,13 +78,7 @@ static void init(void) {
 
 	state.bind.vertex_buffers[2] = sg_make_buffer(&(sg_buffer_desc) {
 		.usage = SG_USAGE_STREAM,
-		.size = NUM_UVS_BYTES,
-	});
-
-	state.bind.storage_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
-		.type = SG_BUFFERTYPE_STORAGEBUFFER,
-		.usage = SG_USAGE_STREAM,
-		.size = NUM_UVS_BYTES,
+		.size = NUM_QUADS * sizeof(float),
 	});
 
 	state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc) {
@@ -105,12 +97,14 @@ static void init(void) {
 		.layout = {
 			.attrs = {
 				[ATTR_texture_position].format = SG_VERTEXFORMAT_FLOAT2,
-				[ATTR_texture_inst_mat0] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset =  0, .buffer_index = 1}, 
-				[ATTR_texture_inst_mat1] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = 16, .buffer_index = 1},
-				[ATTR_texture_inst_mat3] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = 48, .buffer_index = 1},
+				[ATTR_texture_inst_mat0] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = sizeof(float)*4*0, .buffer_index = 1}, 
+				[ATTR_texture_inst_mat1] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = sizeof(float)*4*1, .buffer_index = 1},
+				[ATTR_texture_inst_mat3] = {.format = SG_VERTEXFORMAT_FLOAT4, .offset = sizeof(float)*4*3, .buffer_index = 1},
+				[ATTR_texture_uv_pos]	 = {.format = SG_VERTEXFORMAT_FLOAT,  .buffer_index = 2},
 			},
 			.buffers[0] = {.step_func = SG_VERTEXSTEP_PER_VERTEX},
 			.buffers[1] = {.step_func = SG_VERTEXSTEP_PER_INSTANCE, .stride = sizeof(float)*16},
+			.buffers[2] = {.step_func = SG_VERTEXSTEP_PER_INSTANCE, .stride = sizeof(float)},
 		},
 		.depth = {
 			.compare = SG_COMPAREFUNC_LESS_EQUAL,
@@ -144,6 +138,15 @@ static void init(void) {
 			.size = atlas.width * atlas.height * 4,
 		},
 	});
+
+	uv_data_t uv_arr[NUM_VERTS] = {0.0f};
+	fill_uvs(uv_arr);
+
+	state.bind.storage_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
+		.type = SG_BUFFERTYPE_STORAGEBUFFER,
+		.data = SG_RANGE(uv_arr),
+	});
+
 	stbi_image_free(atlas.data);
 }
 
@@ -239,7 +242,7 @@ void draw_instances() {
 	if (instances == 0) return;
 
 	sg_update_buffer(state.bind.vertex_buffers[1], &SG_RANGE(positions));
-	sg_update_buffer(state.bind.storage_buffers[0], &SG_RANGE(uvs));
+	sg_update_buffer(state.bind.vertex_buffers[2], &SG_RANGE(uvs));
 	sg_apply_bindings(&state.bind);
 
 	vs_params_t vs_params;
@@ -260,11 +263,10 @@ void draw_instances() {
 		.size = NUM_POSITIONS_BYTES,
 	});
 
-	sg_destroy_buffer(state.bind.storage_buffers[0]);
-	state.bind.storage_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
-		.type = SG_BUFFERTYPE_STORAGEBUFFER,
+	sg_destroy_buffer(state.bind.vertex_buffers[2]);
+	state.bind.vertex_buffers[2] = sg_make_buffer(&(sg_buffer_desc) {
 		.usage = SG_USAGE_STREAM,
-		.size = NUM_UVS_BYTES,
+		.size = NUM_QUADS * sizeof(float),
 	});
 }
 
@@ -273,29 +275,7 @@ void draw_texture(Texture2D tex, vec2 pos, vec2 size, float angle) {
 		draw_instances();
 	}
 
-	// quad vertex layout
-	// 0  1
-	// 3  2
-	//
-	// index order
-	// 0, 1, 3
-	// 1, 2, 3
-	
-
-	stbrp_rect texture_rect = get_texture_rect(tex.id);
-
-	int offset = uv_offset(instances);
-	uvs[offset+0].pos[0] = (float)texture_rect.x / (float)NUM_NODES;
-	uvs[offset+0].pos[1] = (float)texture_rect.y / (float)NUM_NODES;
-
-	uvs[offset+1].pos[0] = (float)(texture_rect.x + tex.width) / (float)NUM_NODES;
-	uvs[offset+1].pos[1] = (float)texture_rect.y / (float)NUM_NODES;
-
-	uvs[offset+2].pos[0] = (float)(texture_rect.x + tex.width) / (float)NUM_NODES;
-	uvs[offset+2].pos[1] = (float)(texture_rect.y + tex.height) / (float)NUM_NODES;
-
-	uvs[offset+3].pos[0] = (float)texture_rect.x / (float)NUM_NODES;
-	uvs[offset+3].pos[1] = (float)(texture_rect.y + tex.height) / (float)NUM_NODES;
+	uvs[instances] = tex.id;
 
 	mat4 model;
 	glm_mat4_identity(model);
