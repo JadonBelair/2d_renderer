@@ -33,6 +33,12 @@ bool is_down[NUM_KEYS] = {false};
 bool just_pressed[NUM_KEYS] = {false};
 bool just_released[NUM_KEYS] = {false};
 
+bool mouse_down[3] = {false};
+bool mouse_pressed[3] = {false};
+bool mouse_released[3] = {false};
+
+vec2 mouse_pos = {0.0f};
+
 float width, height;
 window_conf conf;
 
@@ -152,14 +158,39 @@ void cleanup(void) {
 }
 
 void event(const sapp_event* event) {
-	if (event->type == SAPP_EVENTTYPE_KEY_DOWN) {
-		if (!is_down[event->key_code]) {
-			just_pressed[event->key_code] = true;
-		}
-		is_down[event->key_code] = true;
-	} else if (event->type == SAPP_EVENTTYPE_KEY_UP) {
-		just_released[event->key_code] = true;
-		is_down[event->key_code] = false;
+	switch (event->type) {
+		case SAPP_EVENTTYPE_KEY_DOWN:
+			if (!is_down[event->key_code]) {
+				just_pressed[event->key_code] = true;
+			}
+			is_down[event->key_code] = true;
+			break;
+		case SAPP_EVENTTYPE_KEY_UP:
+			just_released[event->key_code] = true;
+			is_down[event->key_code] = false;
+			break;
+		case SAPP_EVENTTYPE_MOUSE_DOWN:
+			if (event->mouse_button == SAPP_MOUSEBUTTON_INVALID)
+				break;
+
+			if (!mouse_down[event->mouse_button]) {
+				mouse_pressed[event->mouse_button] = true;
+			}
+			mouse_down[event->mouse_button] = true;
+			break;
+		case SAPP_EVENTTYPE_MOUSE_UP:
+			if (event->mouse_button == SAPP_MOUSEBUTTON_INVALID)
+				break;
+
+			mouse_released[event->mouse_button] = true;
+			mouse_down[event->mouse_button] = false;
+			break;
+		case SAPP_EVENTTYPE_MOUSE_MOVE:
+			mouse_pos[0] = event->mouse_x;
+			mouse_pos[1] = event->mouse_y;
+			break;
+		default:
+			break;
 	}
 }
 
@@ -303,6 +334,9 @@ void end_frame() {
 
 	memset(just_pressed, 0, sizeof(just_pressed));
 	memset(just_released, 0, sizeof(just_released));
+
+	memset(mouse_pressed, 0, sizeof(mouse_pressed));
+	memset(mouse_released, 0, sizeof(mouse_released));
 }
 
 bool is_key_down(sapp_keycode code) {
@@ -315,6 +349,23 @@ bool is_key_just_pressed(sapp_keycode code) {
 
 bool is_key_just_released(sapp_keycode code) {
 	return just_released[code];
+}
+
+bool is_mouse_button_down(sapp_mousebutton button) {
+	return mouse_down[button];
+}
+
+bool is_mouse_button_just_pressed(sapp_mousebutton button) {
+	return mouse_pressed[button];
+}
+
+bool is_mouse_button_just_released(sapp_mousebutton button) {
+	return mouse_released[button];
+}
+
+void get_mouse_pos(vec2 in) {
+	in[0] = mouse_pos[0];
+	in[1] = mouse_pos[1];
 }
 
 float get_view_width() {

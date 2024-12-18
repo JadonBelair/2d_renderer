@@ -40,6 +40,12 @@ bool is_key_down(sapp_keycode);
 bool is_key_just_pressed(sapp_keycode);
 bool is_key_just_released(sapp_keycode);
 
+bool is_mouse_button_down(sapp_mousebutton);
+bool is_mouse_button_just_pressed(sapp_mousebutton);
+bool is_mouse_button_just_released(sapp_mousebutton);
+
+void get_mouse_pos(vec2);
+
 float get_view_width();
 float get_view_height();
 

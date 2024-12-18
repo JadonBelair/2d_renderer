@@ -26,8 +26,6 @@ void setup() {
 	crate = make_texture("image.png");
 	button = make_texture("button.png");
 	sword = make_texture("sword.png");
-
-	// printf("%d %d\n", crate.id, button.id);
 }
 
 void update() {
@@ -38,6 +36,12 @@ void update() {
 	if (is_key_down(SAPP_KEYCODE_ESCAPE) || is_key_down(SAPP_KEYCODE_Q)) {
 		sapp_request_quit();
 	}
+	if (is_mouse_button_just_pressed(SAPP_MOUSEBUTTON_LEFT)) {
+		printf("pressed\n");
+	}
+	vec2 mp;
+	get_mouse_pos(mp);
+	printf("%f, %f\n", mp[0], mp[1]);
 
 	float speed = 300.0f * delta_time();
 
@@ -61,7 +65,6 @@ void update() {
 
 	pos[0] = glm_clamp(pos[0], 0.0f, get_view_width()-crate.width);
 	pos[1] = glm_clamp(pos[1], 0.0f, get_view_height()-crate.height);
-
 
 	vec2 size = {crate.width, crate.height};
 	for (int i = 0; i < 15000; i++) {
