@@ -88,7 +88,7 @@ void fill_uvs(uv_data_t* uvs) {
 	for (int i = 0; i < count; i++) {
 		int texture_offset = rects[i].id*4;
 
-		vec2 top_left = {(float) rects[i].x / (float) NUM_NODES, };
+		vec2 top_left = {(float) rects[i].x / (float) NUM_NODES, (float) rects[i].y / (float) NUM_NODES};
 		vec2 top_right = {(float)(rects[i].x + rects[i].w) / (float)NUM_NODES, (float)rects[i].y / (float)NUM_NODES};
 		vec2 bottom_right = {(float)(rects[i].x + rects[i].w) / (float)NUM_NODES, (float)(rects[i].y + rects[i].h) / (float)NUM_NODES};
 		vec2 bottom_left = {(float)rects[i].x / (float)NUM_NODES, (float)(rects[i].y + rects[i].h) / (float)NUM_NODES};
