@@ -2,6 +2,10 @@ all: build/main
 build/main: shaders/texture-sapp.h build/main.o build/texture.o build/renderer.o
 	gcc -o ./build/main ./build/*.o -lX11 -lXcursor -lXi -lGL -lm
 
+library: build/renderer.a
+build/renderer.a: build/renderer.o build/texture.o
+	ar rvs build/renderer.a build/renderer.o build/texture.o
+
 build/main.o: src/main.c
 	gcc -c src/main.c -o ./build/main.o
 
