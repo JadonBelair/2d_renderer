@@ -348,6 +348,11 @@ void get_mouse_pos(vec2 in) {
 	in[1] = mouse_pos[1];
 }
 
+void get_mouse_pos_viewport(vec2 in) {
+	in[0] = (mouse_pos[0] / sapp_widthf()) * get_view_width();
+	in[1] = (mouse_pos[1] / sapp_heightf()) * get_view_height();
+}
+
 float get_view_width() {
 	return width;
 }

@@ -40,7 +40,7 @@ void update() {
 		printf("pressed\n");
 	}
 	vec2 mp;
-	get_mouse_pos(mp);
+	get_mouse_pos_viewport(mp);
 	printf("%f, %f\n", mp[0], mp[1]);
 
 	float speed = 300.0f * delta_time();

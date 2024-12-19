@@ -45,6 +45,7 @@ bool is_mouse_button_just_pressed(sapp_mousebutton);
 bool is_mouse_button_just_released(sapp_mousebutton);
 
 void get_mouse_pos(vec2);
+void get_mouse_pos_viewport(vec2);
 
 float get_view_width();
 float get_view_height();
