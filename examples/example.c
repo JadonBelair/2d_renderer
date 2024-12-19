@@ -1,4 +1,4 @@
-#include "renderer.h"
+#include "../src/renderer.h"
 #include <stdlib.h>
 
 vec2 pos;
