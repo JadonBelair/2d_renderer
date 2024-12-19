@@ -16,7 +16,7 @@ example: build/example
 build/example: build/example.o build/renderer.a
 	gcc build/example.o build/renderer.a -o build/example -lX11 -lXcursor -lXi -lGL -lm
 
-build/example.o: examples/example.c
+build/example.o: shaders/texture-sapp.h examples/example.c
 	gcc -c examples/example.c -o ./build/example.o
 
 clean:
