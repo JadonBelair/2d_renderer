@@ -197,11 +197,11 @@ void event(const sapp_event* event) {
 	}
 }
 
-sapp_desc sokol_main(int argc, char **argv) {
+int main(int argc, char **argv) {
 	conf = window_config();
 	int window_width = conf.window_width != 0 ? conf.window_width : conf.viewport_width;
 	int window_height = conf.window_height != 0 ? conf.window_height : conf.viewport_height;
-	return (sapp_desc) {
+	sapp_desc desc = (sapp_desc) {
 		.init_cb = init,
 		.frame_cb = frame,
 		.cleanup_cb = cleanup,
@@ -212,6 +212,9 @@ sapp_desc sokol_main(int argc, char **argv) {
 		.icon.sokol_default = true,
 		.logger.func = slog_func,
 	};
+	sapp_run(&desc);
+
+	return 0;
 }
 
 void mat_to_1d(mat4 mat, float arr[16]) {

@@ -6,6 +6,7 @@
 
 #include "texture.h"
 
+#define SOKOL_NO_ENTRY
 #include "../libs/sokol/sokol_app.h"
 #include "../libs/sokol/sokol_log.h"
 #include "../libs/sokol/sokol_glue.h"
